@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build:
@@ -16,6 +14,8 @@ services:
       - postgres
     networks:
       - symfony_network
+    environment:
+      - COMPOSER_ALLOW_SUPERUSER=1
 
   nginx:
     image: nginx:alpine
@@ -30,18 +30,6 @@ services:
     networks:
       - symfony_network
 
-  postgres:
-    image: postgres:13
-    container_name: symfony_postgres
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: symfony_couriers
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - symfony_network
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin-container
@@ -54,8 +42,24 @@ services:
       - postgres
     networks:
       - symfony_network
+
+  postgres:
+    image: postgres:${POSTGRES_VERSION:-13}
+    container_name: ${POSTGRES_HOST:-postgres}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-symfony_couriers}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - symfony_network
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+
 networks:
-    symfony_network:
+  symfony_network:
 
 volumes:
   postgres_data:
