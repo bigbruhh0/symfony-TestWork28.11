@@ -21,9 +21,9 @@ class Trips
     private ?Couriers $courier = null;
 
 
-    #[ORM\ManyToOne(targetEntity: regions::class)]
+    #[ORM\ManyToOne(targetEntity: Regions::class)]
     #[ORM\JoinColumn(name: 'region_id', referencedColumnName: 'id', nullable: false)]
-    private ?regions $region = null;
+    private ?Regions $region = null;
 
 
     #[ORM\Column(type: 'datetime')]

@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+{% block title %} Расписание поездок {% endblock %}
+{% block body %} 
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Расписание поездок</h1>
+
+        <div class="filter-container mb-4">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="filter-departure-date" class="form-label">Фильтр по дате выезда:</label>
+                    <input type="date" id="filter-departure-date" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label for="filter-arrival-date" class="form-label">Фильтр по дате прибытия:</label>
+                    <input type="date" id="filter-arrival-date" class="form-control">
+                </div>
+            </div>
+            <div>
+            <button id="filter-btn" class="btn btn-primary">Применить</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="table table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Регион</th>
+                        <th>Курьер</th>
+                        <th>Дата выезда</th>
+                        <th>Дата прибытия</th>
+                    </tr>
+                </thead>
+                {% include 'test/table.html.twig' with {'trips': trips} %}
+            </table>
+        </div>     
+    </div>
+    <script>
+
+    </script>
+{% endblock %}
