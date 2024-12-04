@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\TripsRepository;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TripsRepository::class)]
@@ -57,6 +58,18 @@ class Trips
     public function setRegion(?Regions $region): self
     {
         $this->region = $region;
+
+        return $this;
+    }
+    public function setBeginDate(?DateTime $beginDate): self
+    {
+        $this->beginDate = $beginDate;
+
+        return $this;
+    }
+    public function setEndDate(?DateTime $endDate): self
+    {
+        $this->endDate = $endDate;
 
         return $this;
     }

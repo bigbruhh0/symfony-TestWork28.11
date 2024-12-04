@@ -21,7 +21,6 @@ class Regions
     #[ORM\Column]
     private ?int $days = null;
 
-    // Геттеры и сеттеры для name и days
     public function getId(): ?int
     {
         return $this->id;

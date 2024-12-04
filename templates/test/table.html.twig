@@ -1,15 +1,14 @@
-<tbody>
+
     {% for trip in trips %}
         <tr>
             <td>{{ trip.id }}</td>
             <td>{{ trip.region.name }}</td>
             <td>{{ trip.courier.name }}</td>
-            <td>{{ trip.beginDate|date('Y-m-d H:i:s') }}</td>
-            <td>{{ trip.endDate|date('Y-m-d H:i:s') }}</td>
+            <td>{{ trip.beginDate|date('d-m-Y') }}</td>
+            <td>{{ trip.endDate|date('d-m-Y') }}</td>
         </tr>
     {% else %}
         <tr>
             <td colspan="5" class="text-center">Нет данных для отображения</td>
         </tr>
     {% endfor %}
-</tbody>

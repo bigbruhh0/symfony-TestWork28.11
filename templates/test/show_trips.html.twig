@@ -8,12 +8,12 @@
         <div class="filter-container mb-4">
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label for="filter-departure-date" class="form-label">Фильтр по дате выезда:</label>
-                    <input type="date" id="filter-departure-date" class="form-control">
+                    <label for="filter-begin-date" class="form-label">Фильтр по дате выезда:</label>
+                    <input type="date" id="filter-begin-date" class="form-control">
                 </div>
                 <div class="col-md-6">
-                    <label for="filter-arrival-date" class="form-label">Фильтр по дате прибытия:</label>
-                    <input type="date" id="filter-arrival-date" class="form-control">
+                    <label for="filter-end-date" class="form-label">Фильтр по дате прибытия:</label>
+                    <input type="date" id="filter-end-date" class="form-control">
                 </div>
             </div>
             <div>
@@ -32,11 +32,36 @@
                         <th>Дата прибытия</th>
                     </tr>
                 </thead>
+                <tbody id="trips-table">
                 {% include 'test/table.html.twig' with {'trips': trips} %}
+                </tbody>
             </table>
         </div>     
     </div>
     <script>
-
+        $(document).ready(function() {
+        $('#filter-btn').click(function() {
+            $('#loader').fadeIn(500);
+            event.preventDefault();
+            var beginDate = $('#filter-begin-date').val();
+            var endDate = $('#filter-end-date').val();
+            console.log(beginDate,endDate);
+            $.ajax({
+                url: '/api/apply_filters',
+                type: 'GET',
+                data: {
+                    beginDate: beginDate,
+                    endDate: endDate
+                },
+                success: function(response) {
+                    $('#trips-table').html(response);
+                    console.log(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Произошла ошибка при запросе: ", error);
+                }
+                });
+             });
+        });
     </script>
 {% endblock %}
