@@ -27,10 +27,10 @@ class Trips
     private ?Regions $region = null;
 
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: 'date')]
     private ?\DateTimeInterface $beginDate = null;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: 'date')]
     private ?\DateTimeInterface $endDate = null;
 
     public function getId(): ?int

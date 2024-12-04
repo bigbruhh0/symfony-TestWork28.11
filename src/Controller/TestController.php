@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\TripsService;
 use App\Entity\Trips;
 use App\Entity\Couriers;
 use App\Entity\Regions;
@@ -22,17 +22,11 @@ use App\Repository\CouriersRepository;
 use App\Repository\RegionsRepository;
 class TestController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
 
     #[Route('/', name: 'app_test')]
     public function index(): Response
     {
         return $this->render('test/index.html.twig', [
-            'controller_name' => 'TestController',
         ]);
     }
     #[Route('/add_trip', name: 'add_trip')]
@@ -70,9 +64,9 @@ class TestController extends AbstractController
     }
 
     #[Route('/api/add_trip', name: 'api_add_trip', methods: ['POST'])]
-    public function api_add_trip(Request $request, TripsRepository $TripsRepository,CouriersRepository $CouriersRepository,RegionsRepository $RegionsRepository): Response
+    public function api_add_trip(Request $request,TripsService $TripService, TripsRepository $TripsRepository,CouriersRepository $CouriersRepository,RegionsRepository $RegionsRepository): Response
     {   
-        $type = 'green';
+       
 
         $data = json_decode($request->getContent(), true);
 
@@ -83,45 +77,11 @@ class TestController extends AbstractController
         $courierId = isset($data['courierId']) ? intval($data['courierId']) : null;
         $regionId = isset($data['regionId']) ? $data['regionId'] : null;
         $cur_date = isset($data['date']) ? new \DateTime($data['date']) : null;
-        $cur_courier = $CouriersRepository->find($courierId);    
-        $cur_region = $RegionsRepository->find($regionId);
-        $cur_endDate =clone $cur_date;
-        $cur_endDate->modify('+'.$cur_region->getDays().' days');
         
-        $current_trips=$TripsRepository->findForCourier($cur_courier);
-        $result='Поездка успешно добавлена';
         
-        $regions = $RegionsRepository->findAll();
-        $regionsDict = [];
-        foreach ($regions as $region) 
-            {
-                $regionsDict[$region->getId()] = $region->getDays();
-            }
-
-        if ($current_trips)
-            {
-               
-                $date=clone $cur_date;
-                $endDate=$date->modify('+'.$regionsDict[$regionId].' days');
-                foreach ($current_trips as $trip)
-                {
-                    if ($trip->getBeginDate()<$endDate and $trip->getBeginDate()>$cur_date)
-                    {
-                        $result = 'У курьера запланирована поездка : '.$trip->getBeginDate()->format('d-m-Y').' до '.$trip->getEndDate()->format('d-m-Y');
-                    }
-
-                    if ($trip->getBeginDate()<=$cur_date and $trip->getEndDate()>=$cur_date)
-                    {
-                        $result = 'Курьер будет в поездке с '.$trip->getBeginDate()->format('d-m-Y').', освободится : '.$trip->getEndDate()->modify('+1 days')->format('d-m-Y');
-                    }
-
-                }
-            }
-        else
-            {
-                #
-            }
-        if ($result==='Поездка успешно добавлена')
+        [$cur_courier, $cur_region, $cur_endDate, $conflicts] = $TripService->checkConflicts($courierId,$cur_date,$regionId);
+        
+        if ($conflicts==="")
         {
             $trip = new Trips();
 
@@ -132,12 +92,14 @@ class TestController extends AbstractController
             $trip->setBeginDate($cur_date);
             $trip->setEndDate($cur_endDate);
             
-            $this->entityManager->persist($trip);
-            $this->entityManager->flush();
-
+            $TripService->entityManager->persist($trip);
+            $TripService->entityManager->flush();
+            $result="Поездка успешно добавлена! "."с ".$cur_date->format('d-m-Y')." до ".$cur_endDate->format('d-m-Y');
+            $type = 'green';
         }
         else
         {
+            $result=$conflicts;
             $type='red';
         }
 
